@@ -1,0 +1,1 @@
+{ "name": "ricmuk-enterprises", "version": "1.0.0", "description": "Ricmuk Enterprises one-stop hardware shop, Kadoma", "main": "server.js", "scripts": { "start": "node --disable-warning=ExperimentalWarning server.js" }, "engines": { "node": ">=22.5" } }

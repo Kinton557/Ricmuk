@@ -1,0 +1,27 @@
+# Render Blueprint: one web service (site + API + dashboard) with a persistent disk for the database.
+services:
+  - type: web
+    name: ricmuk-enterprises
+    runtime: node
+    plan: starter            # persistent disks need a paid plan (free plans lose data on every deploy)
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: ricmuk-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false          # you type this in the Render dashboard
+      - key: ADMIN_PASSWORD
+        sync: false
