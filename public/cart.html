@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Cart & Checkout | Ricmuk Enterprises</title>
+<meta name="description" content="Review your cart and place your hardware order with Ricmuk Enterprises, Kadoma.">
+<meta name="theme-color" content="#14257a">
+<meta property="og:title" content="Your Cart & Checkout | Ricmuk Enterprises"><meta property="og:description" content="Review your cart and place your hardware order with Ricmuk Enterprises, Kadoma."><meta property="og:type" content="website"><meta property="og:image" content="img/shopfront.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-nav="shop">
+<div id="hdr"></div>
+<main id="main">
+<header class="page-head"><div class="container"><span class="kicker">Checkout</span><h1>Your cart</h1></div></header>
+<section class="section" style="padding-top:30px"><div class="container">
+  <div id="emptyCart" class="empty" hidden><p style="font-size:1.2rem;font-weight:700;color:var(--text)">Your cart is empty</p><p style="margin:8px 0 18px">Add something from the shop to get started.</p><a class="btn btn-red" href="shop.html">Go to the shop</a></div>
+  <div class="cart-layout" id="cartWrap" hidden>
+    <div>
+      <div class="card" style="margin-bottom:22px"><h3>Items</h3><div id="lines"></div></div>
+      <form class="card" id="ckForm" novalidate>
+        <h3>Your details</h3>
+        <div class="row2"><div class="fg"><label class="f" for="cName">Full name</label><input id="cName" autocomplete="name" required></div>
+        <div class="fg"><label class="f" for="cPhone">Phone / WhatsApp</label><input id="cPhone" type="tel" autocomplete="tel" placeholder="077 123 4567" required></div></div>
+        <div class="fg"><label class="f" for="cEmail">Email (optional)</label><input id="cEmail" type="email" autocomplete="email"></div>
+        <h3 style="margin-top:8px">Collection or delivery</h3>
+        <label class="radio-card"><input type="radio" name="method" value="collect" checked><div><strong>Collect from the shop</strong><span id="collectAddr"></span></div></label>
+        <label class="radio-card" id="delivCard"><input type="radio" name="method" value="delivery"><div><strong>Delivery</strong><span id="delivNote">We deliver in and around Kadoma. We confirm the delivery fee by phone.</span></div></label>
+        <div class="fg" id="addrBox" hidden><label class="f" for="cAddr">Delivery address</label><textarea id="cAddr" rows="3" placeholder="Stand number, street, suburb, landmark"></textarea></div>
+        <h3 style="margin-top:8px">Payment</h3>
+        <div id="payBox"></div>
+        <div class="fg" style="margin-top:10px"><label class="f" for="cNote">Note to the shop (optional)</label><textarea id="cNote" rows="2" placeholder="Colour, length to cut, anything we should know"></textarea></div>
+        <button class="btn btn-red btn-block" id="placeBtn" type="submit">Place order</button>
+        <p class="msg" id="ckMsg" role="alert"></p>
+      </form>
+    </div>
+    <aside class="card sticky"><h3>Order summary</h3>
+      <div class="sum-row"><span>Subtotal</span><b id="sSub">$0.00</b></div>
+      <div class="sum-row"><span>Delivery</span><b id="sDel">-</b></div>
+      <div class="sum-row total"><span>Total</span><span id="sTot">$0.00</span></div>
+      <p class="muted small" id="sZwg"></p>
+      <p class="muted small" style="margin-top:12px" id="sNote"></p>
+      <p style="margin-top:14px"><a class="btn btn-wa btn-sm btn-block" id="waOrder" target="_blank" rel="noopener" href="#">Prefer WhatsApp? Send this cart</a></p>
+    </aside>
+  </div>
+</div></section>
+</main>
+<div id="ftr"></div>
+<script src="assets/app.js"></script>
+<script>
+var shopReady;
+App.ready.then(function(){return App.loadShop();}).then(function(){
+  var c=App.cfg,u=App.user;
+  document.getElementById('collectAddr').textContent=c.address+', '+c.area;
+  if(c.delivery_enabled!=='1')document.getElementById('delivCard').hidden=true;
+  if(Number(c.delivery_fee)>0)document.getElementById('delivNote').textContent='We deliver in and around Kadoma. Delivery fee: '+App.money(c.delivery_fee)+'.';
+  document.getElementById('sNote').textContent=c.price_notice||'';
+  var pay='<label class="radio-card"><input type="radio" name="pay" value="shop" checked><div><strong>Pay at the shop or on delivery</strong><span>Cash, EcoCash or swipe, after we confirm your order.</span></div></label>';
+  if(c.pay_ecocash==='1'&&c.ecocash_number)pay+='<label class="radio-card"><input type="radio" name="pay" value="ecocash"><div><strong>Pay by EcoCash now</strong><span>Send to <b>'+App.esc(c.ecocash_number)+'</b>'+(c.ecocash_name?' ('+App.esc(c.ecocash_name)+')':'')+' and enter the EcoCash reference below.</span></div></label><div class="fg" id="refBox" hidden><label class="f" for="cRef">EcoCash reference</label><input id="cRef" maxlength="60" placeholder="e.g. MP260101.1234.A12345"></div>';
+  document.getElementById('payBox').innerHTML=pay;
+  if(u){document.getElementById('cName').value=u.name||'';document.getElementById('cPhone').value=u.phone||'';document.getElementById('cEmail').value=u.email||'';}
+  document.querySelectorAll('[name=method]').forEach(function(r){r.onchange=totals;});
+  document.querySelectorAll('[name=pay]').forEach(function(r){r.onchange=function(){var b=document.getElementById('refBox');if(b)b.hidden=r.value!=='ecocash'||!r.checked;};});
+  render();
+});
+document.addEventListener('cart',function(){if(App.shop)render();});
+function items(){var cart=App.cart.get(),out=[];Object.keys(cart).forEach(function(id){var p=App.product(id);if(p)out.push({p:p,q:cart[id]});else App.cart.remove(id);});return out;}
+function method(){return document.querySelector('[name=method]:checked').value;}
+function render(){
+  var list=items(),has=list.length>0;
+  document.getElementById('emptyCart').hidden=has;document.getElementById('cartWrap').hidden=!has;
+  var box=document.getElementById('lines');
+  if(!document.activeElement||!box.contains(document.activeElement)){
+    box.innerHTML=list.map(function(l){var p=l.p;
+      return '<div class="cart-line" data-id="'+p.id+'"><div class="cart-thumb">'+App.thumb(p)+'</div><div><h4>'+App.esc(p.name)+'</h4><span class="muted small">'+App.money(p.price)+' '+App.esc(p.unit)+'</span>'+(!p.available?'<br><span class="small" style="color:var(--bad);font-weight:700">Out of stock, please remove</span>':'')+'<div style="display:flex;gap:12px;align-items:center;margin-top:8px"><div class="qty"><button type="button" data-d="-1" aria-label="Less">&minus;</button><input type="number" min="1" max="9999" value="'+l.q+'" aria-label="Quantity of '+App.esc(p.name)+'"><button type="button" data-d="1" aria-label="More">+</button></div><button type="button" class="rm" data-rm="1">Remove</button></div></div><div class="line-total">'+App.money(p.price*l.q)+'</div></div>';}).join('');
+  }
+  totals();
+}
+document.getElementById('lines').addEventListener('click',function(e){
+  var row=e.target.closest('.cart-line');if(!row)return;var id=Number(row.dataset.id);
+  if(e.target.closest('[data-rm]'))App.cart.remove(id);
+  var d=e.target.closest('[data-d]');if(d)App.cart.set(id,(App.cart.get()[id]||1)+Number(d.dataset.d));
+});
+document.getElementById('lines').addEventListener('change',function(e){var row=e.target.closest('.cart-line');if(row&&e.target.type==='number')App.cart.set(Number(row.dataset.id),parseInt(e.target.value,10)||1);});
+function totals(){
+  var list=items(),sub=list.reduce(function(a,l){return a+l.p.price*l.q;},0),fee=method()==='delivery'?Number(App.cfg.delivery_fee)||0:0;
+  document.getElementById('sSub').textContent=App.money(sub);
+  document.getElementById('sDel').textContent=method()==='delivery'?(fee>0?App.money(fee):'Confirmed by phone'):'Collect (free)';
+  document.getElementById('sTot').textContent=App.money(sub+fee);
+  var z=App.zwg(sub+fee);document.getElementById('sZwg').textContent=z?'\u2248 '+z:'';
+  document.getElementById('addrBox').hidden=method()!=='delivery';
+  var t='Hello Ricmuk, I would like to order:\n'+list.map(function(l){return '- '+l.q+' x '+l.p.name+' ('+App.money(l.p.price)+' '+l.p.unit+')';}).join('\n')+'\nTotal: '+App.money(sub+fee);
+  document.getElementById('waOrder').href=App.waLink(t);
+}
+document.getElementById('ckForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var msg=document.getElementById('ckMsg'),btn=document.getElementById('placeBtn');msg.className='msg';msg.textContent='';
+  var list=items();if(!list.length){msg.className='msg err';msg.textContent='Your cart is empty.';return;}
+  if(list.some(function(l){return !l.p.available;})){msg.className='msg err';msg.textContent='Please remove the out-of-stock item(s) first.';return;}
+  var payEl=document.querySelector('[name=pay]:checked'),ref=document.getElementById('cRef');
+  var body={items:list.map(function(l){return {id:l.p.id,qty:l.q};}),method:method(),payment:payEl?payEl.value:'shop',paymentRef:ref?ref.value:'',
+    customer:{name:document.getElementById('cName').value,phone:document.getElementById('cPhone').value,email:document.getElementById('cEmail').value,address:document.getElementById('cAddr').value,note:document.getElementById('cNote').value}};
+  if(body.payment==='ecocash'&&!body.paymentRef.trim()){msg.className='msg err';msg.textContent='Please enter your EcoCash reference, or choose to pay at the shop.';return;}
+  btn.disabled=true;btn.textContent='Placing order...';
+  App.api('/api/orders',{body:body}).then(function(d){
+    if(d.success){App.cart.clear();location.href='order.html?no='+encodeURIComponent(d.order_no)+'&phone='+encodeURIComponent(body.customer.phone)+'&new=1';}
+    else{msg.className='msg err';msg.textContent=d.message||'Could not place the order.';btn.disabled=false;btn.textContent='Place order';}
+  });
+});
+</script>
+</body>
+</html>

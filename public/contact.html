@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact & Directions | Ricmuk Enterprises</title>
+<meta name="description" content="Contact Ricmuk Enterprises in Rimuka Light Industry, Kadoma: phone, WhatsApp, opening hours and directions.">
+<meta name="theme-color" content="#14257a">
+<meta property="og:title" content="Contact & Directions | Ricmuk Enterprises"><meta property="og:description" content="Contact Ricmuk Enterprises in Rimuka Light Industry, Kadoma: phone, WhatsApp, opening hours and directions."><meta property="og:type" content="website"><meta property="og:image" content="img/shopfront.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-nav="contact">
+<div id="hdr"></div>
+<main id="main">
+<header class="page-head"><div class="container"><span class="kicker">Get in touch</span><h1>Contact us</h1><p>Call, WhatsApp, send a message or come and see us. We are happy to help.</p></div></header>
+<section class="section" style="padding-top:34px"><div class="container contact-grid">
+  <div class="card"><h3>Find us</h3>
+    <ul class="info-list">
+      <li><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><div><b>Address</b><span id="cAddr"></span><br><a id="cMap" target="_blank" rel="noopener" href="#">Get directions</a></div></li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg><div><b>Call</b><span id="cPh"></span></div></li>
+      <li><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg><div><b>WhatsApp</b><a id="cWa" target="_blank" rel="noopener" href="#">Chat with us</a></div></li>
+      <li><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div><b>Email</b><a id="cMail" href="#"></a></div></li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Opening hours</b><table class="hours"><tr><td>Monday - Friday</td><td id="hW"></td></tr><tr><td>Saturday</td><td id="hS"></td></tr><tr><td>Sunday</td><td id="hU"></td></tr></table></div></li>
+    </ul></div>
+  <form class="card" id="mf" novalidate><h3>Send us a message</h3>
+    <div class="fg"><label class="f" for="mName">Your name</label><input id="mName" autocomplete="name" required></div>
+    <div class="row2"><div class="fg"><label class="f" for="mPhone">Phone</label><input id="mPhone" type="tel" autocomplete="tel"></div><div class="fg"><label class="f" for="mEmail">Email</label><input id="mEmail" type="email" autocomplete="email"></div></div>
+    <div class="fg"><label class="f" for="mMsg">Message</label><textarea id="mMsg" rows="6" required></textarea></div>
+    <button class="btn btn-red btn-block" type="submit">Send message</button><p class="msg" id="mMsgOut" role="alert"></p></form>
+</div></section>
+</main>
+<div id="ftr"></div>
+<script src="assets/app.js"></script>
+<script>
+App.ready.then(function(){
+  var c=App.cfg,$=function(i){return document.getElementById(i);};
+  $('cAddr').textContent=c.address+', '+c.area;$('cMap').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(c.address+', '+c.area);
+  $('cPh').innerHTML=[c.phone1,c.phone2,c.phone3].filter(Boolean).map(function(p){return '<a href="'+App.telLink(p)+'">'+App.esc(p)+'</a>';}).join('<br>');
+  $('cWa').href=App.waLink('Hello Ricmuk Enterprises, I would like to make an enquiry.');$('cMail').textContent=c.email;$('cMail').href='mailto:'+c.email;
+  $('hW').textContent=c.hours_weekdays;$('hS').textContent=c.hours_saturday;$('hU').textContent=c.hours_sunday;
+});
+document.getElementById('mf').addEventListener('submit',function(e){
+  e.preventDefault();var o=document.getElementById('mMsgOut');o.className='msg';o.textContent='';
+  App.api('/api/contact',{body:{name:mName.value,phone:mPhone.value,email:mEmail.value,message:mMsg.value}}).then(function(d){
+    if(d.success){o.className='msg good';o.textContent='Thank you. We have your message and will reply soon.';e.target.reset();}else{o.className='msg err';o.textContent=d.message;}
+  });
+});
+</script>
+</body>
+</html>

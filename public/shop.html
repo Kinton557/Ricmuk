@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Hardware Online | Ricmuk Enterprises</title>
+<meta name="description" content="Browse roofing sheets, angle irons, cement, timber, plumbing, electrical, tiles, pumps and tanks from Ricmuk Enterprises in Kadoma.">
+<meta name="theme-color" content="#14257a">
+<meta property="og:title" content="Shop Hardware Online | Ricmuk Enterprises"><meta property="og:description" content="Browse roofing sheets, angle irons, cement, timber, plumbing, electrical, tiles, pumps and tanks from Ricmuk Enterprises in Kadoma."><meta property="og:type" content="website"><meta property="og:image" content="img/shopfront.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-nav="shop">
+<div id="hdr"></div>
+<main id="main">
+<header class="page-head"><div class="container"><span class="kicker">Online shop</span><h1>Shop hardware</h1><p>Search, filter and add to your cart. We confirm every order by phone before you pay.</p></div></header>
+<section class="section" style="padding-top:30px"><div class="container">
+  <div class="notice" id="notice" hidden></div>
+  <div class="shop-bar">
+    <label class="sr" for="q">Search</label><input id="q" type="search" placeholder="Search products..." autocomplete="off">
+    <label class="sr" for="sort">Sort</label><select id="sort" style="width:auto;flex:0 0 auto"><option value="pop">Popular first</option><option value="az">Name A-Z</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option></select>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Categories"></div>
+  <p class="muted small" id="count" style="margin-bottom:14px" aria-live="polite"></p>
+  <div class="prod-grid" id="grid"></div>
+  <div class="empty" id="none" hidden><p style="font-size:1.1rem;font-weight:600;color:var(--text)">No products match that search.</p><p style="margin:8px 0 16px">Can&rsquo;t find it? We probably still have it.</p><a class="btn btn-red btn-sm" href="quote.html">Ask for a quote</a></div>
+</div></section>
+</main>
+<div id="ftr"></div>
+<script src="assets/app.js"></script>
+<script>
+var st={cat:'',q:'',sort:'pop'};
+App.ready.then(function(){return App.loadShop();}).then(function(s){
+  var u=new URLSearchParams(location.search);st.cat=u.get('cat')||'';st.q=u.get('q')||'';
+  var n=document.getElementById('notice');if(App.cfg.price_notice){n.textContent=App.cfg.price_notice;n.hidden=false;}
+  document.getElementById('q').value=st.q;
+  var chips=document.getElementById('chips');
+  chips.innerHTML='<button type="button" class="chip" data-c="">All</button>'+s.categories.map(function(c){return '<button type="button" class="chip" data-c="'+App.esc(c.slug)+'">'+App.esc(c.name)+'</button>';}).join('');
+  chips.onclick=function(e){var b=e.target.closest('.chip');if(!b)return;st.cat=b.dataset.c;draw();history.replaceState(null,'','?'+(st.cat?'cat='+st.cat:''));};
+  document.getElementById('q').oninput=function(e){st.q=e.target.value;draw();};
+  document.getElementById('sort').onchange=function(e){st.sort=e.target.value;draw();};
+  draw();
+});
+function draw(){
+  var s=App.shop,q=st.q.trim().toLowerCase(),list=s.products.filter(function(p){
+    if(st.cat&&p.category!==st.cat)return false;
+    if(!q)return true;var c=App.category(p.category);
+    return q.split(/\s+/).every(function(w){return (p.name+' '+p.description+' '+(c?c.name:'')).toLowerCase().indexOf(w)>-1;});
+  });
+  if(st.sort==='az')list.sort(function(a,b){return a.name.localeCompare(b.name);});
+  if(st.sort==='lo')list.sort(function(a,b){return a.price-b.price;});
+  if(st.sort==='hi')list.sort(function(a,b){return b.price-a.price;});
+  [].forEach.call(document.querySelectorAll('.chip'),function(c){c.classList.toggle('on',c.dataset.c===st.cat);});
+  document.getElementById('grid').innerHTML=list.map(App.card).join('');
+  document.getElementById('none').hidden=list.length>0;
+  document.getElementById('count').textContent=list.length+' product'+(list.length===1?'':'s');
+}
+</script>
+</body>
+</html>

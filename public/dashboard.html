@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard | Ricmuk Enterprises</title>
+<meta name="description" content="Ricmuk Enterprises admin dashboard.">
+<meta name="theme-color" content="#14257a">
+<meta property="og:title" content="Admin Dashboard | Ricmuk Enterprises"><meta property="og:description" content="Ricmuk Enterprises admin dashboard."><meta property="og:type" content="website"><meta property="og:image" content="img/shopfront.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-nav="" data-no-track>
+<div id="hdr"></div>
+<main id="main">
+<section class="section" style="padding-top:26px"><div class="container">
+  <div id="gate" class="empty" hidden><p style="font-size:1.2rem;font-weight:700;color:var(--text)">Admin sign-in required</p><p style="margin:8px 0 16px">This area is for Ricmuk staff.</p><a class="btn btn-red" href="login.html?next=dashboard.html">Sign in</a></div>
+  <div id="dash" hidden>
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end"><div><span class="kicker">Staff only</span><h1 style="font-size:clamp(2.2rem,5vw,3.4rem)">Dashboard</h1></div><button class="btn btn-line btn-sm" id="refresh" type="button">Refresh</button></div>
+    <nav class="dash-tabs" id="tabs" aria-label="Dashboard sections"></nav>
+    <div id="view" aria-live="polite"></div>
+  </div>
+</div></section>
+<div class="modal" id="adm" role="dialog" aria-modal="true"><div class="modal-card narrow" id="admCard"></div></div>
+</main>
+<div id="ftr"></div>
+<script src="assets/app.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>
